@@ -1,0 +1,303 @@
+.drive-detail-container {
+    padding: 2rem;
+  }
+  
+  .drive-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .drive-detail-header h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin: 0;
+  }
+  
+  .drive-detail-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .drive-detail-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+  }
+  
+  .drive-detail-loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+  }
+  
+  .drive-detail-error {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .drive-detail-error h2 {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+  }
+  
+  .drive-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .drive-info-card,
+  .drive-status-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .card-header h2 {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin: 0;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .info-row {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 0.5rem;
+  }
+  
+  .info-row:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .info-label {
+    width: 150px;
+    font-weight: 600;
+    color: #7f8c8d;
+  }
+  
+  .info-value {
+    flex: 1;
+    color: #2c3e50;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  
+  .badge-primary {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  
+  .badge-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .status-item {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .status-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3498db;
+    margin-bottom: 0.5rem;
+  }
+  
+  .status-label {
+    font-size: 0.875rem;
+    color: #7f8c8d;
+  }
+  
+  .drive-timeline {
+    margin-top: 2rem;
+  }
+  
+  .timeline-item {
+    display: flex;
+    margin-bottom: 1.5rem;
+  }
+  
+  .timeline-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .timeline-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fa;
+    color: #7f8c8d;
+    border-radius: 50%;
+    margin-right: 1rem;
+  }
+  
+  .timeline-icon.active {
+    background-color: #3498db;
+    color: #fff;
+  }
+  
+  .timeline-content h4 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    color: #2c3e50;
+  }
+  
+  .timeline-content p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #7f8c8d;
+  }
+  
+  .students-section {
+    margin-bottom: 2rem;
+  }
+  
+  .vaccination-actions {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .vaccination-actions h3 {
+    font-size: 1.125rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+  
+  .students-tabs {
+    margin-top: 1.5rem;
+  }
+  
+  .tabs-header {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+  
+  .tab-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #7f8c8d;
+  }
+  
+  .tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+  }
+  
+  .students-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  
+  .students-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+  }
+  
+  .no-students {
+    text-align: center;
+    padding: 2rem;
+    color: #7f8c8d;
+  }
+  
+  .back-link {
+    margin-top: 1rem;
+  }
+  
+  .back-link a {
+    display: inline-flex;
+    align-items: center;
+    color: #3498db;
+    text-decoration: none;
+  }
+  
+  .back-link a i {
+    margin-right: 0.5rem;
+  }
+  
+  @media (min-width: 992px) {
+    .drive-detail-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .drive-detail-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  
+    .status-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  

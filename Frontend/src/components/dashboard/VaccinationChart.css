@@ -1,0 +1,24 @@
+.chart-container {
+    height: 300px;
+    position: relative;
+  }
+  
+  .no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+  }
+  
+  .no-data i {
+    font-size: 3rem;
+    color: #bdc3c7;
+    margin-bottom: 1rem;
+  }
+  
+  .no-data p {
+    color: #7f8c8d;
+  }
+  

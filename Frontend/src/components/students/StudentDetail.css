@@ -1,0 +1,215 @@
+.student-detail-container {
+    padding: 2rem;
+  }
+  
+  .student-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .student-detail-header h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin: 0;
+  }
+  
+  .student-detail-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .student-detail-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+  }
+  
+  .student-detail-loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+  }
+  
+  .student-detail-error {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .student-detail-error h2 {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+  }
+  
+  .student-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .student-info-card,
+  .vaccination-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .card-header {
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .card-header h2 {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin: 0;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .info-row {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 0.5rem;
+  }
+  
+  .info-row:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .info-label {
+    width: 150px;
+    font-weight: 600;
+    color: #7f8c8d;
+  }
+  
+  .info-value {
+    flex: 1;
+    color: #2c3e50;
+  }
+  
+  .vaccination-history {
+    margin-bottom: 2rem;
+  }
+  
+  .no-vaccinations {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .no-vaccinations i {
+    font-size: 3rem;
+    color: #bdc3c7;
+    margin-bottom: 1rem;
+  }
+  
+  .no-vaccinations p {
+    color: #7f8c8d;
+  }
+  
+  .mark-vaccination h3 {
+    font-size: 1.125rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+  
+  .vaccination-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .vaccination-form select {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  
+  .badge-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  .back-link {
+    margin-top: 1rem;
+  }
+  
+  .back-link a {
+    display: inline-flex;
+    align-items: center;
+    color: #3498db;
+    text-decoration: none;
+  }
+  
+  .back-link a i {
+    margin-right: 0.5rem;
+  }
+
+  .button-width{
+    width: 200px;
+  }
+  
+  @media (min-width: 992px) {
+    .student-detail-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .student-detail-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  
+    .vaccination-form {
+      flex-direction: column;
+    }
+  
+    .vaccination-form select,
+    .vaccination-form button {
+      width: 100%;
+    }
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
