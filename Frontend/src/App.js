@@ -23,7 +23,6 @@ import VaccinationDrivesList from "./components/vaccination-drives/VaccinationDr
 import VaccinationDriveForm from "./components/vaccination-drives/VaccinationDriveForm"
 import VaccinationDriveDetail from "./components/vaccination-drives/VaccinationDriveDetail"
 import Reports from "./components/reports/Reports"
-// import Analytics from "./components/analytics/Analytics"
 import NotFound from "./components/layout/NotFound"
 
 // Context
@@ -47,14 +46,14 @@ function App() {
           <div className="app-container">
             <ToastContainer position="top-right" autoClose={3000} />
             <Routes>
-              {/* <Route
+              <Route
                 path="/"
                 element={
                   <PrivateRoute>
                     <Navigate to="/dashboard" replace />
                   </PrivateRoute>
                 }
-              /> */}
+              />
               <Route path="/login" element={<Login />} />
               <Route
                 path="/dashboard"
@@ -226,23 +225,6 @@ function App() {
                   </PrivateRoute>
                 }
               />
-              {/* <Route
-                path="/analytics"
-                element={
-                  <PrivateRoute>
-                    <div className="app-wrapper">
-                      <Navbar toggleSidebar={toggleSidebar} />
-                      <div className="content-container">
-                        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-                        <main className={`main-content ${sidebarOpen ? "sidebar-open" : ""}`}>
-                          <Analytics />
-                        </main>
-                      </div>
-                      <Footer />
-                    </div>
-                  </PrivateRoute>
-                }
-              /> */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

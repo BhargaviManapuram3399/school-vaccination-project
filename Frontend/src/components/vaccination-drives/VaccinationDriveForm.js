@@ -163,18 +163,32 @@ const VaccinationDriveForm = () => {
         <div className="card-body">
           <form onSubmit={handleSubmit}>
             <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="vaccineName">Vaccine Name</label>
-                <input
-                  type="text"
-                  id="vaccineName"
-                  name="vaccineName"
-                  value={formData.vaccineName}
-                  onChange={handleChange}
-                  required
-                  placeholder="e.g., MMR, Polio, Hepatitis B"
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="vaccineName">Vaccine Name</label>
+              <select
+                id="vaccineName"
+                name="vaccineName"
+                value={formData.vaccineName}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select a vaccine</option>
+                <option value="COVID-19">COVID-19</option>
+                <option value="Chickenpox">Chickenpox</option>
+                <option value="Flu">Flu</option>
+                <option value="Hepatitis B">Hepatitis B</option>
+                <option value="Measles">Measles</option>
+                <option value="Polio">Polio</option>
+                <option value="Tetanus">Tetanus</option>
+                <option value="MMR">MMR (Measles, Mumps, Rubella)</option>
+                <option value="HPV">HPV (Human Papillomavirus)</option>
+                <option value="DTP">DTP (Diphtheria, Tetanus, Pertussis)</option>
+                <option value="BCG">BCG (Tuberculosis)</option>
+                <option value="Rotavirus">Rotavirus</option>
+                <option value="Hib">Hib (Haemophilus influenzae type B)</option>
+              </select>
+            </div>
+
 
               <div className="form-group">
                 <label htmlFor="driveDate">Drive Date</label>
@@ -254,10 +268,10 @@ const VaccinationDriveForm = () => {
             </div>
 
             <div className="form-actions">
-              <button type="button" className="btn btn-secondary" onClick={() => navigate("/vaccination-drives")}>
+              <button type="button" className="btn btn-secondary button-width" onClick={() => navigate("/vaccination-drives")}>
                 Cancel
               </button>
-              <button type="submit" className="btn btn-primary" disabled={loading}>
+              <button type="submit" className="btn btn-primary button-width" disabled={loading}>
                 {loading ? "Saving..." : isEditMode ? "Update Drive" : "Schedule Drive"}
               </button>
             </div>

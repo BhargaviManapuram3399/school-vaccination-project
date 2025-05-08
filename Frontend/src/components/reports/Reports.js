@@ -28,19 +28,43 @@ const Reports = () => {
   const generateReport = async () => {
     try {
       setLoading(true)
-
-      // Build query string from filters
+  
       const queryParams = new URLSearchParams()
       queryParams.append("page", currentPage)
-
+  
       if (filters.vaccineName) queryParams.append("vaccineName", filters.vaccineName)
       if (filters.fromDate) queryParams.append("fromDate", filters.fromDate)
       if (filters.toDate) queryParams.append("toDate", filters.toDate)
       if (filters.status) queryParams.append("status", filters.status)
-
+  
       const res = await axios.get(`/api/vaccination-drives/reports/generate?${queryParams.toString()}`)
-
-      setReportData(res.data.data)
+  
+      let students = res.data.data
+  
+      const vaccineLower = filters.vaccineName?.toLowerCase() || null
+      const fromDate = filters.fromDate ? new Date(filters.fromDate) : null
+      const toDate = filters.toDate ? new Date(filters.toDate) : null
+      const statusFilter = filters.status || null
+  
+      students = students.map((student) => {
+        const filteredVaccinations = student.vaccinations.filter((v) => {
+          const vaccineDate = new Date(v.dateAdministered)
+  
+          return (
+            (!vaccineLower || v.vaccineName.toLowerCase().includes(vaccineLower)) &&
+            (!fromDate || vaccineDate >= fromDate) &&
+            (!toDate || vaccineDate <= toDate) &&
+            (!statusFilter || v.status === statusFilter)
+          )
+        })
+  
+        return {
+          ...student,
+          vaccinations: filteredVaccinations,
+        }
+      }).filter((student) => student.vaccinations.length > 0)
+  
+      setReportData(students)
       setTotalPages(res.data.pagination.pages)
       setLoading(false)
     } catch (err) {
@@ -50,6 +74,7 @@ const Reports = () => {
       toast.error("Failed to generate report")
     }
   }
+  
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target
@@ -144,20 +169,20 @@ const Reports = () => {
           </div>
         </div>
         <div className="filter-actions">
-          <button className="btn btn-primary" onClick={generateReport}>
+          <button className="btn btn-primary button-width" onClick={generateReport}>
             Generate Report
           </button>
-          <button className="btn btn-secondary" onClick={clearFilters}>
+          <button className="btn btn-secondary button-width" onClick={clearFilters}>
             Clear Filters
           </button>
           {reportData.length > 0 && (
             <CSVLink
               data={prepareCSVData().data}
               headers={prepareCSVData().headers}
-              filename={`vaccination-report-${new Date().toISOString().split("T")[0]}.csv`}
-              className="btn btn-success"
+              filename={`vaccination-report-${new Date().toISOString().split("T")[0]}.xlsx`}
+              className="btn btn-success button-width"
             >
-              <i className="fas fa-download"></i> Download CSV
+              <i className="fas fa-download"></i> Download Excel
             </CSVLink>
           )}
         </div>

@@ -44,11 +44,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <i className="fas fa-file-alt"></i> Reports
           </Link>
         </li>
-        <li className={isActive("/analytics")}>
-          <Link to="/analytics" onClick={handleLinkClick}>
-            <i className="fas fa-chart-bar"></i> Analytics
-          </Link>
-        </li>
       </ul>
     </div>
   )

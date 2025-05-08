@@ -225,6 +225,9 @@
     color: #bdc3c7;
     cursor: not-allowed;
   }
+  .button-width{
+    width: 150px;
+  }
   
   @media (max-width: 768px) {
     .filter-actions {

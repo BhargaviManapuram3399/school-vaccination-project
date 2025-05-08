@@ -147,7 +147,7 @@ const VaccinationDrivesList = () => {
               Show only upcoming drives (next 30 days)
             </label>
           </div>
-          <button className="btn btn-secondary" onClick={clearFilters}>
+          <button className="btn btn-secondary button-width" onClick={clearFilters}>
             Clear Filters
           </button>
         </div>

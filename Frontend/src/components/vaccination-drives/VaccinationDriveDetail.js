@@ -17,6 +17,7 @@ const VaccinationDriveDetail = () => {
   const [eligibleStudents, setEligibleStudents] = useState([])
   const [selectedStudents, setSelectedStudents] = useState([])
   const [loadingStudents, setLoadingStudents] = useState(false)
+  const [activeTab, setActiveTab] = useState("eligible")
 
   useEffect(() => {
     fetchDrive()
@@ -29,7 +30,6 @@ const VaccinationDriveDetail = () => {
       setDrive(res.data.data)
       setLoading(false)
 
-      // After fetching drive, get students
       fetchStudents(res.data.data)
     } catch (err) {
       console.error("Error fetching vaccination drive:", err)
@@ -43,26 +43,22 @@ const VaccinationDriveDetail = () => {
     try {
       setLoadingStudents(true)
 
-      // Get students who are already vaccinated in this drive
       const vaccinatedRes = await axios.get(`/api/students?vaccinationStatus=vaccinated`)
       const allVaccinated = vaccinatedRes.data.data
 
-      // Filter to only those vaccinated in this specific drive
       const driveVaccinated = allVaccinated.filter((student) =>
-        student.vaccinations.some((v) => v.vaccineId === id && v.status === "Completed"),
+        student.vaccinations.some((v) => v.vaccineId === id && v.status === "Completed")
       )
 
       setVaccinatedStudents(driveVaccinated)
 
-      // Get eligible students (in applicable classes and not already vaccinated for this vaccine)
       const eligibleRes = await axios.get(`/api/students`)
       const allStudents = eligibleRes.data.data
 
-      // Filter to only those in applicable classes and not already vaccinated for this vaccine
       const eligible = allStudents.filter(
         (student) =>
           driveData.applicableClasses.includes(student.class) &&
-          !student.vaccinations.some((v) => v.vaccineName === driveData.vaccineName && v.status === "Completed"),
+          !student.vaccinations.some((v) => v.vaccineName === driveData.vaccineName && v.status === "Completed")
       )
 
       setEligibleStudents(eligible)
@@ -75,11 +71,9 @@ const VaccinationDriveDetail = () => {
   }
 
   const handleStudentSelection = (studentId) => {
-    if (selectedStudents.includes(studentId)) {
-      setSelectedStudents(selectedStudents.filter((id) => id !== studentId))
-    } else {
-      setSelectedStudents([...selectedStudents, studentId])
-    }
+    setSelectedStudents((prev) =>
+      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
+    )
   }
 
   const markSelectedAsVaccinated = async () => {
@@ -96,15 +90,12 @@ const VaccinationDriveDetail = () => {
     try {
       setLoadingStudents(true)
 
-      // Mark each selected student as vaccinated
       for (const studentId of selectedStudents) {
         await axios.put(`/api/students/${studentId}/vaccinate/${id}`)
       }
 
       toast.success(`${selectedStudents.length} students marked as vaccinated`)
       setSelectedStudents([])
-
-      // Refresh data
       fetchDrive()
     } catch (err) {
       console.error("Error marking students as vaccinated:", err)
@@ -126,7 +117,6 @@ const VaccinationDriveDetail = () => {
     }
   }
 
-  // Format date
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" }
     return new Date(dateString).toLocaleDateString(undefined, options)
@@ -164,14 +154,14 @@ const VaccinationDriveDetail = () => {
         <h1>Vaccination Drive Details</h1>
         <div className="drive-detail-actions">
           {!isPast && (
-            <Link to={`/vaccination-drives/edit/${id}`} className="btn btn-primary">
-              <i className="fas fa-edit"></i> Edit
-            </Link>
-          )}
-          {!isPast && (
-            <button className="btn btn-danger" onClick={deleteDrive}>
-              <i className="fas fa-trash-alt"></i> Delete
-            </button>
+            <>
+              <Link to={`/vaccination-drives/edit/${id}`} className="btn btn-primary">
+                <i className="fas fa-edit"></i> Edit
+              </Link>
+              <button className="btn btn-danger" onClick={deleteDrive}>
+                <i className="fas fa-trash-alt"></i> Delete
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -180,88 +170,32 @@ const VaccinationDriveDetail = () => {
         <div className="drive-info-card">
           <div className="card-header">
             <h2>Drive Information</h2>
-            <span
-              className={`badge badge-${
-                drive.status === "Scheduled" ? "primary" : drive.status === "Completed" ? "success" : "warning"
-              }`}
-            >
+            <span className={`badge badge-${drive.status === "Scheduled" ? "primary" : drive.status === "Completed" ? "success" : "warning"}`}>
               {drive.status}
             </span>
           </div>
           <div className="card-body">
-            <div className="info-row">
-              <div className="info-label">Vaccine:</div>
-              <div className="info-value">{drive.vaccineName}</div>
-            </div>
-            <div className="info-row">
-              <div className="info-label">Date:</div>
-              <div className="info-value">{formatDate(drive.driveDate)}</div>
-            </div>
-            <div className="info-row">
-              <div className="info-label">Available Doses:</div>
-              <div className="info-value">{drive.availableDoses}</div>
-            </div>
-            <div className="info-row">
-              <div className="info-label">Applicable Classes:</div>
-              <div className="info-value">{drive.applicableClasses.join(", ")}</div>
-            </div>
-            {drive.description && (
-              <div className="info-row">
-                <div className="info-label">Description:</div>
-                <div className="info-value">{drive.description}</div>
-              </div>
-            )}
+            <div className="info-row"><div className="info-label">Vaccine:</div><div className="info-value">{drive.vaccineName}</div></div>
+            <div className="info-row"><div className="info-label">Date:</div><div className="info-value">{formatDate(drive.driveDate)}</div></div>
+            <div className="info-row"><div className="info-label">Available Doses:</div><div className="info-value">{drive.availableDoses}</div></div>
+            <div className="info-row"><div className="info-label">Applicable Classes:</div><div className="info-value">{drive.applicableClasses.join(", ")}</div></div>
+            {drive.description && <div className="info-row"><div className="info-label">Description:</div><div className="info-value">{drive.description}</div></div>}
           </div>
         </div>
 
         <div className="drive-status-card">
-          <div className="card-header">
-            <h2>Drive Status</h2>
-          </div>
+          <div className="card-header"><h2>Drive Status</h2></div>
           <div className="card-body">
             <div className="status-grid">
-              <div className="status-item">
-                <div className="status-value">{drive.availableDoses}</div>
-                <div className="status-label">Available Doses</div>
-              </div>
-              <div className="status-item">
-                <div className="status-value">{vaccinatedStudents.length}</div>
-                <div className="status-label">Vaccinated Students</div>
-              </div>
-              <div className="status-item">
-                <div className="status-value">{eligibleStudents.length}</div>
-                <div className="status-label">Eligible Students</div>
-              </div>
+              <div className="status-item"><div className="status-value">{drive.availableDoses}</div><div className="status-label">Available Doses</div></div>
+              <div className="status-item"><div className="status-value">{vaccinatedStudents.length}</div><div className="status-label">Vaccinated Students</div></div>
+              <div className="status-item"><div className="status-value">{eligibleStudents.length}</div><div className="status-label">Eligible Students</div></div>
             </div>
 
             <div className="drive-timeline">
-              <div className="timeline-item">
-                <div className="timeline-icon">
-                  <i className="fas fa-calendar-plus"></i>
-                </div>
-                <div className="timeline-content">
-                  <h4>Created</h4>
-                  <p>{formatDate(drive.createdAt)}</p>
-                </div>
-              </div>
-              <div className="timeline-item">
-                <div className={`timeline-icon ${isPast || isToday ? "active" : ""}`}>
-                  <i className="fas fa-syringe"></i>
-                </div>
-                <div className="timeline-content">
-                  <h4>Drive Date</h4>
-                  <p>{formatDate(drive.driveDate)}</p>
-                </div>
-              </div>
-              <div className="timeline-item">
-                <div className={`timeline-icon ${drive.status === "Completed" ? "active" : ""}`}>
-                  <i className="fas fa-check-circle"></i>
-                </div>
-                <div className="timeline-content">
-                  <h4>Completion</h4>
-                  <p>{drive.status === "Completed" ? formatDate(drive.updatedAt) : "Pending"}</p>
-                </div>
-              </div>
+              <div className="timeline-item"><div className="timeline-icon"><i className="fas fa-calendar-plus"></i></div><div className="timeline-content"><h4>Created</h4><p>{formatDate(drive.createdAt)}</p></div></div>
+              <div className={`timeline-item`}><div className={`timeline-icon ${isPast || isToday ? "active" : ""}`}><i className="fas fa-syringe"></i></div><div className="timeline-content"><h4>Drive Date</h4><p>{formatDate(drive.driveDate)}</p></div></div>
+              <div className={`timeline-item`}><div className={`timeline-icon ${drive.status === "Completed" ? "active" : ""}`}><i className="fas fa-check-circle"></i></div><div className="timeline-content"><h4>Completion</h4><p>{drive.status === "Completed" ? formatDate(drive.updatedAt) : "Pending"}</p></div></div>
             </div>
           </div>
         </div>
@@ -269,90 +203,105 @@ const VaccinationDriveDetail = () => {
 
       <div className="students-section">
         <div className="card">
-          <div className="card-header">
-            <h2>Manage Vaccinations</h2>
-          </div>
+          <div className="card-header"><h2>Manage Vaccinations</h2></div>
           <div className="card-body">
             {loadingStudents ? (
-              <div className="students-loading">
-                <div className="spinner"></div>
-                <p>Loading students...</p>
-              </div>
+              <div className="students-loading"><div className="spinner"></div><p>Loading students...</p></div>
             ) : (
               <>
                 <div className="vaccination-actions">
                   <h3>Mark Students as Vaccinated</h3>
                   {drive.availableDoses > 0 && !isPast ? (
                     <>
-                      <p>
-                        Select students to mark as vaccinated. {drive.availableDoses} doses available.{" "}
-                        {selectedStudents.length} students selected.
-                      </p>
-                      <button
-                        className="btn btn-success"
-                        onClick={markSelectedAsVaccinated}
-                        disabled={selectedStudents.length === 0}
-                      >
+                      <p>Select students to mark as vaccinated. {drive.availableDoses} doses available. {selectedStudents.length} students selected.</p>
+                      <button className="btn btn-success button-width" onClick={markSelectedAsVaccinated} disabled={selectedStudents.length === 0}>
                         Mark Selected as Vaccinated
                       </button>
                     </>
                   ) : (
-                    <p>
-                      {isPast
-                        ? "Cannot mark students as vaccinated for past drives."
-                        : "No doses available for this vaccination drive."}
-                    </p>
+                    <p>{isPast ? "Cannot mark students as vaccinated for past drives." : "No doses available for this vaccination drive."}</p>
                   )}
                 </div>
 
                 <div className="students-tabs">
                   <div className="tabs-header">
-                    <button className="tab-btn active">Eligible Students</button>
-                    <button className="tab-btn">Vaccinated Students</button>
+                    <button className={`tab-btn ${activeTab === "eligible" ? "active" : ""}`} onClick={() => setActiveTab("eligible")}>Eligible Students</button>
+                    <button className={`tab-btn ${activeTab === "vaccinated" ? "active" : ""}`} onClick={() => setActiveTab("vaccinated")}>Vaccinated Students</button>
                   </div>
 
                   <div className="tab-content">
-                    {eligibleStudents.length === 0 ? (
-                      <div className="no-students">
-                        <p>No eligible students found for this vaccination drive.</p>
-                      </div>
-                    ) : (
-                      <div className="table-container">
-                        <table className="table">
-                          <thead>
-                            <tr>
-                              {!isPast && drive.availableDoses > 0 && <th>Select</th>}
-                              <th>Name</th>
-                              <th>ID</th>
-                              <th>Class</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {eligibleStudents.map((student) => (
-                              <tr key={student._id}>
-                                {!isPast && drive.availableDoses > 0 && (
-                                  <td>
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedStudents.includes(student._id)}
-                                      onChange={() => handleStudentSelection(student._id)}
-                                    />
-                                  </td>
-                                )}
-                                <td>{student.name}</td>
-                                <td>{student.studentId}</td>
-                                <td>{student.class}</td>
-                                <td>
-                                  <Link to={`/students/${student._id}`} className="btn-icon" title="View Student">
-                                    <i className="fas fa-eye"></i>
-                                  </Link>
-                                </td>
+                    {activeTab === "eligible" ? (
+                      eligibleStudents.length === 0 ? (
+                        <div className="no-students"><p>No eligible students found for this vaccination drive.</p></div>
+                      ) : (
+                        <div className="table-container">
+                          <table className="table">
+                            <thead>
+                              <tr>
+                                {!isPast && drive.availableDoses > 0 && <th>Select</th>}
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Class</th>
+                                <th>Actions</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                            </thead>
+                            <tbody>
+                              {eligibleStudents.map((student) => (
+                                <tr key={student._id}>
+                                  {!isPast && drive.availableDoses > 0 && (
+                                    <td>
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedStudents.includes(student._id)}
+                                        onChange={() => handleStudentSelection(student._id)}
+                                      />
+                                    </td>
+                                  )}
+                                  <td>{student.name}</td>
+                                  <td>{student.studentId}</td>
+                                  <td>{student.class}</td>
+                                  <td>
+                                    <Link to={`/students/${student._id}`} className="btn-icon" title="View Student">
+                                      <i className="fas fa-eye"></i>
+                                    </Link>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )
+                    ) : (
+                      vaccinatedStudents.length === 0 ? (
+                        <div className="no-students"><p>No vaccinated students recorded for this drive.</p></div>
+                      ) : (
+                        <div className="table-container">
+                          <table className="table">
+                            <thead>
+                              <tr>
+                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Class</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {vaccinatedStudents.map((student) => (
+                                <tr key={student._id}>
+                                  <td>{student.name}</td>
+                                  <td>{student.studentId}</td>
+                                  <td>{student.class}</td>
+                                  <td>
+                                    <Link to={`/students/${student._id}`} className="btn-icon" title="View Student">
+                                      <i className="fas fa-eye"></i>
+                                    </Link>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )
                     )}
                   </div>
                 </div>

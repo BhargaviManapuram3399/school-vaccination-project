@@ -277,6 +277,10 @@
     margin-right: 0.5rem;
   }
   
+  .button-width{
+    width: 250px;
+  }
+
   @media (min-width: 992px) {
     .drive-detail-grid {
       grid-template-columns: 1fr 1fr;

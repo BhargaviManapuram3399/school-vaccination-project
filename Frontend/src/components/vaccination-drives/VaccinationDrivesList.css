@@ -155,8 +155,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -169,7 +169,7 @@
   }
   
   .drive-date .day {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #2c3e50;
   }
@@ -280,6 +280,10 @@
   .pagination-link.disabled {
     color: #bdc3c7;
     cursor: not-allowed;
+  }
+
+  .button-width{
+    width: 150px;
   }
   
   @media (max-width: 768px) {
