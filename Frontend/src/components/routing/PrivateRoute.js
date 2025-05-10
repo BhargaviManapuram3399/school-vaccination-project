@@ -8,7 +8,7 @@ const PrivateRoute = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(null) // Add state to track login status
 
   useEffect(() => {
-    const loginStatus = localStorage.getItem("isLoggedIn")
+    const loginStatus = localStorage.getItem("isLoggedIn") === "true"
     setIsLoggedIn(loginStatus) // Update state based on localStorage
   }, [])
 
@@ -19,7 +19,7 @@ const PrivateRoute = ({ children }) => {
 
   // If not logged in, redirect to login page
   if (!isLoggedIn) {
-    return <Navigate to="/login" />
+    return <Navigate to="/login" replace />
   }
 
   // If logged in, render the protected content

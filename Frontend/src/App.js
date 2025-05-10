@@ -46,14 +46,16 @@ function App() {
           <div className="app-container">
             <ToastContainer position="top-right" autoClose={3000} />
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <Navigate to="/dashboard" replace />
-                  </PrivateRoute>
-                }
-              />
+            <Route
+              path="/"
+              element={
+                localStorage.getItem("isLoggedIn") === "true" ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
               <Route path="/login" element={<Login />} />
               <Route
                 path="/dashboard"
