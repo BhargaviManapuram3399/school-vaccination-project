@@ -1,126 +1,138 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, Link, useNavigate } from "react-router-dom"
-import axios from "axios"
-import { toast } from "react-toastify"
-import "./VaccinationDriveDetail.css"
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "./VaccinationDriveDetail.css";
 
 const VaccinationDriveDetail = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const [drive, setDrive] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [vaccinatedStudents, setVaccinatedStudents] = useState([])
-  const [eligibleStudents, setEligibleStudents] = useState([])
-  const [selectedStudents, setSelectedStudents] = useState([])
-  const [loadingStudents, setLoadingStudents] = useState(false)
-  const [activeTab, setActiveTab] = useState("eligible")
+  const [drive, setDrive] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [vaccinatedStudents, setVaccinatedStudents] = useState([]);
+  const [eligibleStudents, setEligibleStudents] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [activeTab, setActiveTab] = useState("eligible");
 
   useEffect(() => {
-    fetchDrive()
-  }, [id])
+    fetchDrive();
+  }, [id]);
 
   const fetchDrive = async () => {
     try {
-      setLoading(true)
-      const res = await axios.get(`/api/vaccination-drives/${id}`)
-      setDrive(res.data.data)
-      setLoading(false)
-
-      fetchStudents(res.data.data)
+      setLoading(true);
+      const res = await axios.get(`/api/vaccination-drives/${id}`);
+      const driveData = res.data.data;
+      setDrive(driveData);
+      setLoading(false);
+      await fetchStudents(driveData);
     } catch (err) {
-      console.error("Error fetching vaccination drive:", err)
-      setError("Failed to fetch vaccination drive details")
-      setLoading(false)
-      toast.error("Failed to fetch vaccination drive details")
+      console.error("Error fetching vaccination drive:", err);
+      setError("Failed to fetch vaccination drive details");
+      setLoading(false);
+      toast.error("Failed to fetch vaccination drive details");
     }
-  }
+  };
 
   const fetchStudents = async (driveData) => {
+    if (!driveData) return;
+
     try {
-      setLoadingStudents(true)
+      setLoadingStudents(true);
+      const studentsRes = await axios.get(`/api/students`);
+      const allStudents = studentsRes.data.data;
 
-      const vaccinatedRes = await axios.get(`/api/students?vaccinationStatus=vaccinated`)
-      const allVaccinated = vaccinatedRes.data.data
+      const vaccinated = allStudents.filter((student) => {
+        return (
+          student.vaccinations &&
+          student.vaccinations.some(
+            (v) => String(v.vaccineId) === String(driveData._id) && v.status === "Completed"
+          )
+        );
+      });
 
-      const driveVaccinated = allVaccinated.filter((student) =>
-        student.vaccinations.some((v) => v.vaccineId === id && v.status === "Completed")
-      )
+      setVaccinatedStudents(vaccinated);
 
-      setVaccinatedStudents(driveVaccinated)
+      const eligible = allStudents.filter((student) => {
+        const isClassEligible = driveData.applicableClasses.includes(student.class);
+        const hasVaccination =
+          student.vaccinations &&
+          student.vaccinations.some(
+            (v) => String(v.vaccineId) === String(driveData._id) && v.status === "Completed"
+          );
+        return isClassEligible && !hasVaccination;
+      });
 
-      const eligibleRes = await axios.get(`/api/students`)
-      const allStudents = eligibleRes.data.data
-
-      const eligible = allStudents.filter(
-        (student) =>
-          driveData.applicableClasses.includes(student.class) &&
-          !student.vaccinations.some((v) => v.vaccineName === driveData.vaccineName && v.status === "Completed")
-      )
-
-      setEligibleStudents(eligible)
-      setLoadingStudents(false)
+      setEligibleStudents(eligible);
+      setLoadingStudents(false);
     } catch (err) {
-      console.error("Error fetching students:", err)
-      setLoadingStudents(false)
-      toast.error("Failed to fetch students")
+      console.error("Error fetching students:", err);
+      setLoadingStudents(false);
+      toast.error("Failed to fetch students");
     }
-  }
+  };
 
   const handleStudentSelection = (studentId) => {
     setSelectedStudents((prev) =>
-      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
-    )
-  }
+      prev.includes(studentId)
+        ? prev.filter((id) => id !== studentId)
+        : [...prev, studentId]
+    );
+  };
 
   const markSelectedAsVaccinated = async () => {
     if (selectedStudents.length === 0) {
-      toast.warning("Please select at least one student")
-      return
+      toast.warning("Please select at least one student");
+      return;
     }
 
     if (selectedStudents.length > drive.availableDoses) {
-      toast.error(`Only ${drive.availableDoses} doses available. Please select fewer students.`)
-      return
+      toast.error(`Only ${drive.availableDoses} doses available. Please select fewer students.`);
+      return;
     }
 
     try {
-      setLoadingStudents(true)
+      setLoadingStudents(true);
 
       for (const studentId of selectedStudents) {
-        await axios.put(`/api/students/${studentId}/vaccinate/${id}`)
+        await axios.put(`/api/students/${studentId}/vaccinate/${id}`);
       }
 
-      toast.success(`${selectedStudents.length} students marked as vaccinated`)
-      setSelectedStudents([])
-      fetchDrive()
+      toast.success(`${selectedStudents.length} students marked as vaccinated`);
+      setSelectedStudents([]);
+
+      const updatedDrive = (await axios.get(`/api/vaccination-drives/${id}`)).data.data;
+      setDrive(updatedDrive);
+      await fetchStudents(updatedDrive);
     } catch (err) {
-      console.error("Error marking students as vaccinated:", err)
-      setLoadingStudents(false)
-      toast.error(err.response?.data?.message || "Failed to mark students as vaccinated")
+      console.error("Error marking students as vaccinated:", err);
+      setLoadingStudents(false);
+      toast.error(err.response?.data?.message || "Failed to mark students as vaccinated");
     }
-  }
+  };
 
   const deleteDrive = async () => {
     if (window.confirm("Are you sure you want to delete this vaccination drive?")) {
       try {
-        await axios.delete(`/api/vaccination-drives/${id}`)
-        toast.success("Vaccination drive deleted successfully")
-        navigate("/vaccination-drives")
+        await axios.delete(`/api/vaccination-drives/${id}`);
+        toast.success("Vaccination drive deleted successfully");
+        navigate("/vaccination-drives");
       } catch (err) {
-        console.error("Error deleting vaccination drive:", err)
-        toast.error(err.response?.data?.message || "Failed to delete vaccination drive")
+        console.error("Error deleting vaccination drive:", err);
+        toast.error(err.response?.data?.message || "Failed to delete vaccination drive");
       }
     }
-  }
+  };
 
   const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "numeric" }
-    return new Date(dateString).toLocaleDateString(undefined, options)
-  }
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   if (loading) {
     return (
@@ -128,7 +140,7 @@ const VaccinationDriveDetail = () => {
         <div className="spinner"></div>
         <p>Loading vaccination drive data...</p>
       </div>
-    )
+    );
   }
 
   if (error || !drive) {
@@ -140,13 +152,13 @@ const VaccinationDriveDetail = () => {
           Back to Vaccination Drives
         </Link>
       </div>
-    )
+    );
   }
 
-  const driveDate = new Date(drive.driveDate)
-  const today = new Date()
-  const isPast = driveDate < today
-  const isToday = driveDate.toDateString() === today.toDateString()
+  const driveDate = new Date(drive.driveDate);
+  const today = new Date();
+  const isPast = driveDate < today;
+  const isToday = driveDate.toDateString() === today.toDateString();
 
   return (
     <div className="drive-detail-container">
@@ -170,7 +182,9 @@ const VaccinationDriveDetail = () => {
         <div className="drive-info-card">
           <div className="card-header">
             <h2>Drive Information</h2>
-            <span className={`badge badge-${drive.status === "Scheduled" ? "primary" : drive.status === "Completed" ? "success" : "warning"}`}>
+            <span
+              className={`badge badge-${drive.status === "Scheduled" ? "primary" : drive.status === "Completed" ? "success" : "warning"}`}
+            >
               {drive.status}
             </span>
           </div>
@@ -179,7 +193,9 @@ const VaccinationDriveDetail = () => {
             <div className="info-row"><div className="info-label">Date:</div><div className="info-value">{formatDate(drive.driveDate)}</div></div>
             <div className="info-row"><div className="info-label">Available Doses:</div><div className="info-value">{drive.availableDoses}</div></div>
             <div className="info-row"><div className="info-label">Applicable Classes:</div><div className="info-value">{drive.applicableClasses.join(", ")}</div></div>
-            {drive.description && <div className="info-row"><div className="info-label">Description:</div><div className="info-value">{drive.description}</div></div>}
+            {drive.description && (
+              <div className="info-row"><div className="info-label">Description:</div><div className="info-value">{drive.description}</div></div>
+            )}
           </div>
         </div>
 
@@ -190,12 +206,6 @@ const VaccinationDriveDetail = () => {
               <div className="status-item"><div className="status-value">{drive.availableDoses}</div><div className="status-label">Available Doses</div></div>
               <div className="status-item"><div className="status-value">{vaccinatedStudents.length}</div><div className="status-label">Vaccinated Students</div></div>
               <div className="status-item"><div className="status-value">{eligibleStudents.length}</div><div className="status-label">Eligible Students</div></div>
-            </div>
-
-            <div className="drive-timeline">
-              <div className="timeline-item"><div className="timeline-icon"><i className="fas fa-calendar-plus"></i></div><div className="timeline-content"><h4>Created</h4><p>{formatDate(drive.createdAt)}</p></div></div>
-              <div className={`timeline-item`}><div className={`timeline-icon ${isPast || isToday ? "active" : ""}`}><i className="fas fa-syringe"></i></div><div className="timeline-content"><h4>Drive Date</h4><p>{formatDate(drive.driveDate)}</p></div></div>
-              <div className={`timeline-item`}><div className={`timeline-icon ${drive.status === "Completed" ? "active" : ""}`}><i className="fas fa-check-circle"></i></div><div className="timeline-content"><h4>Completion</h4><p>{drive.status === "Completed" ? formatDate(drive.updatedAt) : "Pending"}</p></div></div>
             </div>
           </div>
         </div>
@@ -213,20 +223,41 @@ const VaccinationDriveDetail = () => {
                   <h3>Mark Students as Vaccinated</h3>
                   {drive.availableDoses > 0 && !isPast ? (
                     <>
-                      <p>Select students to mark as vaccinated. {drive.availableDoses} doses available. {selectedStudents.length} students selected.</p>
-                      <button className="btn btn-success button-width" onClick={markSelectedAsVaccinated} disabled={selectedStudents.length === 0}>
+                      <p>
+                        Select students to mark as vaccinated. {drive.availableDoses} doses available.{" "}
+                        {selectedStudents.length} students selected.
+                      </p>
+                      <button
+                        className="btn btn-success button-width"
+                        onClick={markSelectedAsVaccinated}
+                        disabled={selectedStudents.length === 0}
+                      >
                         Mark Selected as Vaccinated
                       </button>
                     </>
                   ) : (
-                    <p>{isPast ? "Cannot mark students as vaccinated for past drives." : "No doses available for this vaccination drive."}</p>
+                    <p>
+                      {isPast
+                        ? "Cannot mark students as vaccinated for past drives."
+                        : "No doses available for this vaccination drive."}
+                    </p>
                   )}
                 </div>
 
                 <div className="students-tabs">
                   <div className="tabs-header">
-                    <button className={`tab-btn ${activeTab === "eligible" ? "active" : ""}`} onClick={() => setActiveTab("eligible")}>Eligible Students</button>
-                    <button className={`tab-btn ${activeTab === "vaccinated" ? "active" : ""}`} onClick={() => setActiveTab("vaccinated")}>Vaccinated Students</button>
+                    <button
+                      className={`tab-btn ${activeTab === "eligible" ? "active" : ""}`}
+                      onClick={() => setActiveTab("eligible")}
+                    >
+                      Eligible Students ({eligibleStudents.length})
+                    </button>
+                    <button
+                      className={`tab-btn ${activeTab === "vaccinated" ? "active" : ""}`}
+                      onClick={() => setActiveTab("vaccinated")}
+                    >
+                      Vaccinated Students ({vaccinatedStudents.length})
+                    </button>
                   </div>
 
                   <div className="tab-content">
@@ -271,37 +302,35 @@ const VaccinationDriveDetail = () => {
                           </table>
                         </div>
                       )
+                    ) : vaccinatedStudents.length === 0 ? (
+                      <div className="no-students"><p>No vaccinated students recorded for this drive.</p></div>
                     ) : (
-                      vaccinatedStudents.length === 0 ? (
-                        <div className="no-students"><p>No vaccinated students recorded for this drive.</p></div>
-                      ) : (
-                        <div className="table-container">
-                          <table className="table">
-                            <thead>
-                              <tr>
-                                <th>Name</th>
-                                <th>ID</th>
-                                <th>Class</th>
-                                <th>Actions</th>
+                      <div className="table-container">
+                        <table className="table">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>ID</th>
+                              <th>Class</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {vaccinatedStudents.map((student) => (
+                              <tr key={student._id}>
+                                <td>{student.name}</td>
+                                <td>{student.studentId}</td>
+                                <td>{student.class}</td>
+                                <td>
+                                  <Link to={`/students/${student._id}`} className="btn-icon" title="View Student">
+                                    <i className="fas fa-eye"></i>
+                                  </Link>
+                                </td>
                               </tr>
-                            </thead>
-                            <tbody>
-                              {vaccinatedStudents.map((student) => (
-                                <tr key={student._id}>
-                                  <td>{student.name}</td>
-                                  <td>{student.studentId}</td>
-                                  <td>{student.class}</td>
-                                  <td>
-                                    <Link to={`/students/${student._id}`} className="btn-icon" title="View Student">
-                                      <i className="fas fa-eye"></i>
-                                    </Link>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -317,7 +346,7 @@ const VaccinationDriveDetail = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default VaccinationDriveDetail
+export default VaccinationDriveDetail;
