@@ -1,20 +1,49 @@
-const express = require("express")
-const router = express.Router()
-const LoginController = require("../../controllers/LoginController")
+const express = require("express");
+const router = express.Router();
+const LoginController = require("../../controllers/LoginController");
 
-// @route   POST /api/auth/login
-// @desc    Authenticate user & get token
-// @access  Public
-router.post("/login", LoginController.login)
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication and user login
+ */
 
-// @route   GET /api/auth/user
-// @desc    Get current user
-// @access  Private
-// router.get("/user", LoginController.getCurrentUser)
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Authenticate user and return a token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User authenticated
+ *       401:
+ *         description: Invalid credentials
+ */
+router.post("/login", LoginController.login);
 
-// @route   GET /api/auth/dashboard
-// @desc    Get dashboard data
-// @access  Private
-router.get("/dashboard", LoginController.dashboard)
+/**
+ * @swagger
+ * /auth/dashboard:
+ *   get:
+ *     summary: Get dashboard data for authenticated user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Dashboard data
+ */
+router.get("/dashboard", LoginController.dashboard);
 
-module.exports = router
+module.exports = router;

@@ -1,45 +1,174 @@
-const express = require("express")
-const router = express.Router()
-const StudentController = require("../../controllers/StudentController")
-const multer = require("multer")
+const express = require("express");
+const router = express.Router();
+const StudentController = require("../../controllers/StudentController");
+const multer = require("multer");
 
 // Configure multer for file uploads
-const storage = multer.memoryStorage()
-const upload = multer({ storage })
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// @route   GET /api/students
-// @desc    Get all students with optional filtering
-// @access  Private
-router.get("/", StudentController.getAllStudents)
+/**
+ * @swagger
+ * tags:
+ *   name: Students
+ *   description: Student management endpoints
+ */
 
-// @route   GET /api/students/:id
-// @desc    Get a single student by ID
-// @access  Private
-router.get("/:id", StudentController.getStudentById)
+/**
+ * @swagger
+ * /students:
+ *   get:
+ *     summary: Get all students
+ *     tags: [Students]
+ *     responses:
+ *       200:
+ *         description: A list of students
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Student'
+ */
+router.get("/", StudentController.getAllStudents);
 
-// @route   POST /api/students
-// @desc    Create a new student
-// @access  Private
-router.post("/", StudentController.createStudent)
+/**
+ * @swagger
+ * /students/{id}:
+ *   get:
+ *     summary: Get a student by ID
+ *     tags: [Students]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Student ID
+ *     responses:
+ *       200:
+ *         description: Student data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Student'
+ */
+router.get("/:id", StudentController.getStudentById);
 
-// @route   PUT /api/students/:id
-// @desc    Update a student
-// @access  Private
-router.put("/:id", StudentController.updateStudent)
+/**
+ * @swagger
+ * /students:
+ *   post:
+ *     summary: Create a new student
+ *     tags: [Students]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Student'
+ *     responses:
+ *       201:
+ *         description: Student created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Student'
+ */
+router.post("/", StudentController.createStudent);
 
-// @route   DELETE /api/students/:id
-// @desc    Delete a student
-// @access  Private
-router.delete("/:id", StudentController.deleteStudent)
+/**
+ * @swagger
+ * /students/{id}:
+ *   put:
+ *     summary: Update a student
+ *     tags: [Students]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Student ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Student'
+ *     responses:
+ *       200:
+ *         description: Student updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Student'
+ */
+router.put("/:id", StudentController.updateStudent);
 
-// @route   POST /api/students/import
-// @desc    Bulk import students from CSV
-// @access  Private
-router.post("/import", upload.single("file"), StudentController.bulkImportStudents)
+/**
+ * @swagger
+ * /students/{id}:
+ *   delete:
+ *     summary: Delete a student
+ *     tags: [Students]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Student deleted
+ */
+router.delete("/:id", StudentController.deleteStudent);
 
-// @route   PUT /api/students/:studentId/vaccinate/:driveId
-// @desc    Mark student as vaccinated
-// @access  Private
-router.put("/:studentId/vaccinate/:driveId", StudentController.markVaccinated)
+/**
+ * @swagger
+ * /students/import:
+ *   post:
+ *     summary: Bulk import students from CSV
+ *     tags: [Students]
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Students imported
+ */
+router.post("/import", upload.single("file"), StudentController.bulkImportStudents);
 
-module.exports = router
+/**
+ * @swagger
+ * /students/{studentId}/vaccinate/{driveId}:
+ *   put:
+ *     summary: Mark a student as vaccinated
+ *     tags: [Students]
+ *     parameters:
+ *       - in: path
+ *         name: studentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: driveId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Vaccination marked
+ */
+router.put("/:studentId/vaccinate/:driveId", StudentController.markVaccinated);
+
+module.exports = router;

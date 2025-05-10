@@ -1,20 +1,48 @@
-const express = require("express")
-const router = express.Router()
-const DashboardController = require("../../controllers/DashboardController")
+const express = require("express");
+const router = express.Router();
+const DashboardController = require("../../controllers/DashboardController");
 
-// @route   GET /api/dashboard/overview
-// @desc    Get dashboard overview data
-// @access  Private
-router.get("/overview", DashboardController.getDashboardOverview)
+/**
+ * @swagger
+ * tags:
+ *   name: Dashboard
+ *   description: Dashboard-related insights and statistics
+ */
 
-// @route   GET /api/dashboard/stats/class
-// @desc    Get vaccination statistics by class
-// @access  Private
-router.get("/stats/class", DashboardController.getVaccinationStatsByClass)
+/**
+ * @swagger
+ * /dashboard/overview:
+ *   get:
+ *     summary: Get dashboard overview data
+ *     tags: [Dashboard]
+ *     responses:
+ *       200:
+ *         description: Dashboard overview data
+ */
+router.get("/overview", DashboardController.getDashboardOverview);
 
-// @route   GET /api/dashboard/trends/monthly
-// @desc    Get monthly vaccination trends
-// @access  Private
-router.get("/trends/monthly", DashboardController.getMonthlyVaccinationTrends)
+/**
+ * @swagger
+ * /dashboard/stats/class:
+ *   get:
+ *     summary: Get vaccination statistics by class
+ *     tags: [Dashboard]
+ *     responses:
+ *       200:
+ *         description: Vaccination statistics by class
+ */
+router.get("/stats/class", DashboardController.getVaccinationStatsByClass);
 
-module.exports = router
+/**
+ * @swagger
+ * /dashboard/trends/monthly:
+ *   get:
+ *     summary: Get monthly vaccination trends
+ *     tags: [Dashboard]
+ *     responses:
+ *       200:
+ *         description: Monthly vaccination trend data
+ */
+router.get("/trends/monthly", DashboardController.getMonthlyVaccinationTrends);
+
+module.exports = router;
