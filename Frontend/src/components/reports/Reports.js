@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
-import { CSVLink } from "react-csv"
+import * as XLSX from "xlsx"
+import { saveAs } from "file-saver"
 import "./Reports.css"
 
 const Reports = () => {
@@ -105,31 +106,29 @@ const Reports = () => {
   }
 
   // Prepare CSV data
-  const prepareCSVData = () => {
-    const headers = [
-      { label: "Student Name", key: "name" },
-      { label: "Student ID", key: "studentId" },
-      { label: "Class", key: "class" },
-      { label: "Grade", key: "grade" },
-      { label: "Vaccine", key: "vaccineName" },
-      { label: "Date Administered", key: "dateAdministered" },
-      { label: "Status", key: "status" },
-    ]
 
-    const data = reportData.flatMap((student) =>
+  const downloadExcel = () => {
+    const exportData = reportData.flatMap((student) =>
       student.vaccinations.map((vaccination) => ({
-        name: student.name,
-        studentId: student.studentId,
-        class: student.class,
-        grade: student.grade,
-        vaccineName: vaccination.vaccineName,
-        dateAdministered: formatDate(vaccination.dateAdministered),
-        status: vaccination.status,
+        "Student Name": student.name,
+        "Student ID": student.studentId,
+        "Class": student.class,
+        "Grade": student.grade,
+        "Vaccine": vaccination.vaccineName,
+        "Date Administered": formatDate(vaccination.dateAdministered),
+        "Status": vaccination.status,
       })),
     )
-
-    return { headers, data }
+  
+    const worksheet = XLSX.utils.json_to_sheet(exportData)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Vaccination Report")
+  
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" })
+    saveAs(data, `vaccination-report-${new Date().toISOString().split("T")[0]}.xlsx`)
   }
+  
 
   return (
     <div className="reports-container">
@@ -176,14 +175,9 @@ const Reports = () => {
             Clear Filters
           </button>
           {reportData.length > 0 && (
-            <CSVLink
-              data={prepareCSVData().data}
-              headers={prepareCSVData().headers}
-              filename={`vaccination-report-${new Date().toISOString().split("T")[0]}.xlsx`}
-              className="btn btn-success button-width"
-            >
-              <i className="fas fa-download"></i> Download Excel
-            </CSVLink>
+            <button className="btn btn-success button-width" onClick={downloadExcel}>
+            <i className="fas fa-download"></i> Download Excel
+            </button>
           )}
         </div>
       </div>
