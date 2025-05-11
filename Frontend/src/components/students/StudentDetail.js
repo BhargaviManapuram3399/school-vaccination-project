@@ -74,31 +74,47 @@ const StudentDetail = () => {
       return
     }
 
-    try {
-      await axios.put(`/api/students/${id}/vaccinate/${selectedDrive}`)
-      toast.success("Student marked as vaccinated")
-
-      // Refresh all data after marking as vaccinated
-      const studentRes = await axios.get(`/api/students/${id}`)
-      setStudent(studentRes.data.data)
-
-      // Re-filter eligible drives
-      const updatedStudent = studentRes.data.data
-      const receivedVaccines = updatedStudent.vaccinations ? updatedStudent.vaccinations.map((v) => v.vaccineName) : []
-
-      const eligible = vaccinationDrives.filter((drive) => {
-        const isClassEligible = drive.applicableClasses.includes(updatedStudent.class)
-        const alreadyVaccinated = receivedVaccines.includes(drive.vaccineName)
-        return isClassEligible && !alreadyVaccinated
-      })
-
-      setEligibleDrives(eligible)
-      setSelectedDrive("")
-    } catch (err) {
-      console.error("Error marking student as vaccinated:", err)
-      toast.error(err.response?.data?.message || "Failed to mark student as vaccinated")
-    }
-  }
+      try {
+        const response = await axios.put(`/api/students/${id}/vaccinate/${selectedDrive}`);
+    
+        // Axios may throw if backend sends status like 204 or non-JSON
+        if (response.status === 204 || (response.status >= 200 && response.status < 300)) {
+          toast.success("Student marked as vaccinated");
+        } else {
+          console.warn("Unexpected response:", response);
+          toast.warning("Marked, but got unexpected response from server");
+        }
+    
+        // Attempt to refresh data
+        try {
+          const studentRes = await axios.get(`/api/students/${id}`);
+          const updatedStudent = studentRes.data.data;
+          setStudent(updatedStudent);
+    
+          const receivedVaccines = updatedStudent.vaccinations
+            ? updatedStudent.vaccinations.map((v) => v.vaccineId)
+            : [];
+          
+          const eligible = vaccinationDrives.filter((drive) => {
+            const isClassEligible = drive.applicableClasses.includes(updatedStudent.class);
+            const alreadyVaccinated = receivedVaccines.some(id => id?.toString() === drive._id);
+            return isClassEligible && !alreadyVaccinated;
+          });
+    
+          setEligibleDrives(eligible);
+          setSelectedDrive("");
+        } catch (refreshError) {
+          console.error("Failed to refresh student data:", refreshError);
+          toast.warning("Vaccinated but failed to refresh student data");
+        }
+      } catch (err) {
+        console.error("Error from vaccination API:", err);
+        if (err.response) {
+          console.error("Server response:", err.response.status, err.response.data);
+        }
+        toast.error(err.response?.data?.message || "Failed to mark student as vaccinated");
+      }
+    };
 
   const deleteStudent = async () => {
     if (window.confirm("Are you sure you want to delete this student?")) {
