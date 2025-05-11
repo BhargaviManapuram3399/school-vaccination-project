@@ -13,7 +13,7 @@ const vaccinationDriveSchema = new mongoose.Schema({
   availableDoses: {
     type: Number,
     required: true,
-    min: 1,
+    min: 0,
   },
   applicableClasses: [
     {
