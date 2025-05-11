@@ -27,16 +27,6 @@ A comprehensive web application for managing and tracking vaccination drives in 
 - MongoDB (Atlas)
 - npm
 
-### Environment Variables
-
-Create a `.env` file in the root directory of the backend with the following variables:
-
-\`\`\`
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-\`\`\`
-
 ### Installation & Setup
 
 #### Backend
@@ -86,19 +76,14 @@ JWT_SECRET=your_jwt_secret
 ## 📱 Application Preview
 
 ### Login Screen
-![Login Screen](http://localhost:3000/dashboard)
 
 ### Dashboard
-![Dashboard](https://i.imgur.com/JKgXmLs.png)
 
 ### Students Management
-![Students Management](https://i.imgur.com/JKgXmLs.png)
 
 ### Vaccination Drives
-![Vaccination Drives](https://i.imgur.com/JKgXmLs.png)
 
 ### Reports
-![Reports](https://i.imgur.com/JKgXmLs.png)
 
 ## 🔑 Default Login Credentials
 
